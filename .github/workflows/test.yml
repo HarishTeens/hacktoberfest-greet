@@ -1,20 +1,13 @@
-name: "units-test"
-on:
-  pull_request_target:
-  pull_request:
-  push:
-    branches:
-      - main
-      - 'releases/*'
-
+on: pull_request_target
 jobs:
+  
   hello_world_job:
     runs-on: ubuntu-latest
     name: A job to comment hello
     steps:
     - name: Hello world action step
       id: hello
-      uses: HarishTeens/javascript-action-temp@test
+      uses: HarishTeens/woofy@master
       with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
