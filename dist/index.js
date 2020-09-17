@@ -23,16 +23,16 @@ const { url } = __webpack_require__(7012);
 
 
 const gf = new giphy.GiphyFetch('sXpGFDGZs0Dv1mmNFvYaGUvYwKX0PWIh')
-let gifURL;
  
-// fetch 10 gifs
+// fetch 20 gifs
 
 const getGifs=async ()=>{
-  const gifs=await gf.search("dogs", {limit: 1 })
-  gifs.data.forEach((each)=>{
-    gifURL=each.images.original.url;
-  })
+  const limit=20;
+  const gifs=await gf.search("dogs", {limit: limit })
+  const randomIndex=Math.floor(Math.floor(Math.random() * limit) + 1 );
+  return gifs.data[randomIndex].images.original.url;
 }
+
 
 const makeComment=async (github_token,url,number,body)=>{
   const octokit=new Octokit({auth:github_token})
@@ -43,36 +43,28 @@ const makeComment=async (github_token,url,number,body)=>{
   console.log(new_comment);
 }
 
-try {
-  
-  const payload = github.context.payload
-  const github_token = core.getInput('GITHUB_TOKEN');
+const run=async ()=>{
+  try {  
+    const payload = github.context.payload
+    const github_token = core.getInput('GITHUB_TOKEN');  
+    const context = github.context;
+    const senderLogin=payload.sender.login;
+    const url=context.payload.pull_request.comments_url.substr(22);
+    // const senderLogin="hari";    
+    const pull_request_number = context.payload.pull_request.number;
+    // const pull_request_number="1";
 
-  const context = github.context;
-  const senderLogin=payload.sender.login;
-  const url=context.payload.pull_request.comments_url.substr(22);
-  // const senderLogin="hari";
-  if (context.payload.pull_request == null) {
-      core.setFailed('No pull request found.');
-      return;
-  }
-  const pull_request_number = context.payload.pull_request.number;
-  // const pull_request_number="1";
- 
-  
-  
-  getGifs().then(()=>{    
+    const gifURL=await getGifs();
     const message= '![image]('+gifURL+') \n  Hello '+senderLogin+' , '+
-    'Thanks for your Commits, keep it rolling and be patient until a Reviewer merges it. '+ 
-    'Until then hope this doggy keeps you company 🚀  . ';
-    makeComment(github_token,url,pull_request_number,message);
-  });
-  
-} catch (error) {
-  core.setFailed(error.message);
+      'Thanks for your Commits, keep it rolling and be patient until a Reviewer merges it. '+ 
+      'Until then hope this doggy keeps you company. Stay safe 🚀  . ';
+      makeComment(github_token,url,pull_request_number,message);    
+  } catch (error) {
+    core.setFailed(error.message);
+  }
 }
 
-//Abel PR
+run();
 
 
 /***/ }),
