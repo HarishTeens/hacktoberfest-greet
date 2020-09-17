@@ -8,3 +8,5 @@ You can now consume the action by referencing the v1.0.1 tag.
   with:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+May the Dog be with you
