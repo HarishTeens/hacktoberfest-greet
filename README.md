@@ -1,7 +1,7 @@
 # Woofy Greet Actions
 ## Usage
 
-You can now consume the action by referencing the v1.0.1 tag.
+You can now consume the action by referencing the v1.0.2 tag.
 
 ```yaml
 - uses: HarishTeens/woofy-actions@v1.0.2
