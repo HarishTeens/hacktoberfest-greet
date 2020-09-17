@@ -1,13 +1,11 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: 'woofy'
+description: 'Greet someone and record the time'
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
-    required: true
-    default: '1000'
+  GITHUB_TOKEN:
+    required: true 
 outputs:
-  time: # output will be available to future steps
-    description: 'The message to output'
+  time: # id of output
+    description: 'The time we greeted you'
 runs:
   using: 'node12'
-  main: 'dist/index.js'
+  main: 'index.js'

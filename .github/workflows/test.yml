@@ -1,5 +1,6 @@
 name: "units-test"
 on:
+  pull_request_target:
   pull_request:
   push:
     branches:
@@ -23,3 +24,16 @@ jobs:
     - uses: ./
       with:
         milliseconds: 1000
+
+        on: pull_request_target
+
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: A job to comment hello
+    steps:
+    - name: Hello world action step
+      id: hello
+      uses: HarishTeens/woofy@master
+      with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
