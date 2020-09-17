@@ -1,4 +1,4 @@
-name: 'woofy'
+name: ' '
 description: 'Greet someone and record the time'
 inputs:
   GITHUB_TOKEN:
@@ -9,3 +9,7 @@ outputs:
 runs:
   using: 'node12'
   main: 'dist/index.js'
+
+branding:
+  icon: 'activity'
+  color: 'green'
