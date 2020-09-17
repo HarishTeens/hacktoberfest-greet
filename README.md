@@ -1,10 +1,10 @@
 # Woofy Greet Actions
 ## Usage
 
-You can now consume the action by referencing the v1.0.2 branch
+You can now consume the action by referencing the appropriate branch
 
 ```yaml
-- uses: HarishTeens/javascript-action-temp@v1.0.3
+- uses: HarishTeens/woofy-greet@v1.0.3
   with:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
