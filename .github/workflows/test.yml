@@ -7,13 +7,14 @@ on:
       - main
       - 'releases/*'
 
+jobs:
   hello_world_job:
     runs-on: ubuntu-latest
     name: A job to comment hello
     steps:
     - name: Hello world action step
       id: hello
-      uses: HarishTeens/woofy@master
+      uses: HarishTeens/javascript-action-temp@test
       with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
