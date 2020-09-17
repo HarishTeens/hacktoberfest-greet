@@ -55,6 +55,7 @@ const run=async ()=>{
     // const pull_request_number="1";
 
     const gifURL=await getGifs();
+    console.log(gifURL);
     const message= '![image]('+gifURL+') \n  Hello '+senderLogin+' , '+
       'Thanks for your Commits, keep it rolling and be patient until a Reviewer merges it. '+ 
       'Until then hope this doggy keeps you company. Stay safe 🚀  . ';
