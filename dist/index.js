@@ -29,9 +29,10 @@ const gf = new giphy.GiphyFetch('sXpGFDGZs0Dv1mmNFvYaGUvYwKX0PWIh')
 const getGifs=async ()=>{
   const limit=20;
   const gifs=await gf.search("dogs", {limit: limit })
-  const randomIndex=Math.floor(Math.floor(Math.random() * 6) + 1 );
-  return gifs[randomIndex].images.original.url;
+  const randomIndex=Math.floor(Math.floor(Math.random() * limit) + 1 );
+  return gifs.data[randomIndex].images.original.url;
 }
+
 
 const makeComment=async (github_token,url,number,body)=>{
   const octokit=new Octokit({auth:github_token})
@@ -56,7 +57,7 @@ const run=async ()=>{
     const gifURL=await getGifs();
     const message= '![image]('+gifURL+') \n  Hello '+senderLogin+' , '+
       'Thanks for your Commits, keep it rolling and be patient until a Reviewer merges it. '+ 
-      'Until then hope this doggy keeps you company 🚀  . ';
+      'Until then hope this doggy keeps you company. Stay safe 🚀  . ';
       makeComment(github_token,url,pull_request_number,message);    
   } catch (error) {
     core.setFailed(error.message);
@@ -64,6 +65,7 @@ const run=async ()=>{
 }
 
 run();
+
 
 /***/ }),
 

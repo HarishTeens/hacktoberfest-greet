@@ -15,8 +15,9 @@ const getGifs=async ()=>{
   const limit=20;
   const gifs=await gf.search("dogs", {limit: limit })
   const randomIndex=Math.floor(Math.floor(Math.random() * limit) + 1 );
-  return gifs[randomIndex].images.original.url;
+  return gifs.data[randomIndex].images.original.url;
 }
+
 
 const makeComment=async (github_token,url,number,body)=>{
   const octokit=new Octokit({auth:github_token})
