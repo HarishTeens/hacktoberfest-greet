@@ -55,7 +55,7 @@ const run=async ()=>{
     // const pull_request_number="1";
 
     const gifURL=await getGifs();
-    const attributionURL="https://pasteboard.co/JrQfAs7.png";
+    const attributionURL="https://i.ibb.co/09kYQsj/Poweredby-100px-White-Vert-Logo.png";
     const message= '![image]('+gifURL+') ![image]('+attributionURL+') \n  Hello '+senderLogin+' , '+
       'Thanks for your Commits, keep it rolling and be patient until a Reviewer merges it. '+ 
       'Until then hope this doggy keeps you company. Stay safe 🚀  . ';
