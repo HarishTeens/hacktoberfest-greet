@@ -42,8 +42,8 @@ const run=async ()=>{
     const gifURL=await getGifs();
     const attributionURL="https://i.ibb.co/09kYQsj/Poweredby-100px-White-Vert-Logo.png";
     const message= '![image]('+gifURL+') ![image]('+attributionURL+') \n  Hello '+senderLogin+' , '+
-      'That's a great improvement to the code. Have a pinch of paitence while the reviewer gets impressed by the changes you made. '+
-      'Here are some doggos for company while you are waiting for the merge and striding towards your Hackotberfest Goal. Stay safe 🚀  .';
+      'That\'s a great improvement to the code. Have a pinch of paitence while the reviewer gets impressed by the changes you made. '+
+      'Here are some doggos for company while you are waiting for the merge and striding towards your Hackotberfest Goal. Stay safe 🚀  .' ;
       
 
       makeComment(github_token,url,pull_request_number,message);    
