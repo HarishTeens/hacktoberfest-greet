@@ -1,6 +1,6 @@
 # Woofy Comment
 
-### A cute little actions which comments on your Pull Request
+### A cute little actions which comments on your Pull Request made in the time of Hacktoberfest
 
 
 ## Usage
