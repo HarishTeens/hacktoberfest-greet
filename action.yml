@@ -1,11 +1,8 @@
-name: 'Woofy Greet'
-description: 'Greet someone and record the time'
+name: 'Hacktoberfest Greet'
+description: 'Greet someone and when someone makes a Pull Request'
 inputs:
   GITHUB_TOKEN:
     required: true 
-outputs:
-  time: # id of output
-    description: 'The time we greeted you'
 runs:
   using: 'node12'
   main: 'dist/index.js'
