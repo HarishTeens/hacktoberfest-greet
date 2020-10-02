@@ -17,7 +17,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:      
-      - uses: HarishTeens/woofy-actions@v1.1.0
+      - uses: HarishTeens/hacktoberfest-greet@v1.1.0
         with:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
