@@ -12,7 +12,7 @@ const gf = new giphy.GiphyFetch('rtRTm960F16bWsnMzUnAbn34EnOHgLM3')
 // fetch 20 gifs
 
 const getGifs=async ()=>{
-  const limit=20;
+  const limit=50;
   const gifs=await gf.search("dogs", {limit: limit })
   const randomIndex=Math.floor(Math.floor(Math.random() * limit) + 1 );
   return gifs.data[randomIndex].images.original.url;
@@ -43,7 +43,7 @@ const run=async ()=>{
     const attributionURL="https://i.ibb.co/09kYQsj/Poweredby-100px-White-Vert-Logo.png";
     const message= '![image]('+gifURL+') ![image]('+attributionURL+') \n  Hello @'+senderLogin+' , '+
     'That\'s a great improvement to the code. Have a pinch of paitence while the reviewer gets impressed by the changes you made. '+
-    'Here are some doggos for company while you are waiting for the merge and marching ahead with your Hackotberfest Contributions, '+
+    'Here are some doggos for company while you are waiting for the merge and marching ahead with your Hacktoberfest Contributions, '+
     'Check your [Dashboard](https://hacktoberfest.digitalocean.com/profile) for more information on Hacktoberfest. Stay safe 🚀  .' ;
       
 
