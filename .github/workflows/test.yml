@@ -6,6 +6,6 @@ jobs:
     steps:
     - name: Hello world action step
       id: hello
-      uses: HarishTeens/hacktoberfest-greet@v1.1.0
+      uses: HarishTeens/hacktoberfest-greet@main
       with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
