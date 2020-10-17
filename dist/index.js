@@ -6,7 +6,7 @@ require('./sourcemap-register.js');module.exports =
 /***/ ((module) => {
 
 "use strict";
-module.exports = {"i8":"1.6.2"};
+module.exports = {"i8":"1.7.0"};
 
 /***/ }),
 
@@ -27,7 +27,7 @@ const gf = new giphy.GiphyFetch('rtRTm960F16bWsnMzUnAbn34EnOHgLM3')
 // fetch 20 gifs
 
 const getGifs=async ()=>{
-  const limit=20;
+  const limit=50;
   const gifs=await gf.search("dogs", {limit: limit })
   const randomIndex=Math.floor(Math.floor(Math.random() * limit) + 1 );
   return gifs.data[randomIndex].images.original.url;
@@ -58,7 +58,7 @@ const run=async ()=>{
     const attributionURL="https://i.ibb.co/09kYQsj/Poweredby-100px-White-Vert-Logo.png";
     const message= '![image]('+gifURL+') ![image]('+attributionURL+') \n  Hello @'+senderLogin+' , '+
     'That\'s a great improvement to the code. Have a pinch of paitence while the reviewer gets impressed by the changes you made. '+
-    'Here are some doggos for company while you are waiting for the merge and marching ahead with your Hackotberfest Contributions, '+
+    'Here are some doggos for company while you are waiting for the merge and marching ahead with your Hacktoberfest Contributions, '+
     'Check your [Dashboard](https://hacktoberfest.digitalocean.com/profile) for more information on Hacktoberfest. Stay safe 🚀  .' ;
       
 
@@ -87,6 +87,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const os = __importStar(__webpack_require__(2087));
+const utils_1 = __webpack_require__(5278);
 /**
  * Commands
  *
@@ -140,28 +141,14 @@ class Command {
         return cmdStr;
     }
 }
-/**
- * Sanitizes an input into a string so it can be passed into issueCommand safely
- * @param input input to sanitize into a string
- */
-function toCommandValue(input) {
-    if (input === null || input === undefined) {
-        return '';
-    }
-    else if (typeof input === 'string' || input instanceof String) {
-        return input;
-    }
-    return JSON.stringify(input);
-}
-exports.toCommandValue = toCommandValue;
 function escapeData(s) {
-    return toCommandValue(s)
+    return utils_1.toCommandValue(s)
         .replace(/%/g, '%25')
         .replace(/\r/g, '%0D')
         .replace(/\n/g, '%0A');
 }
 function escapeProperty(s) {
-    return toCommandValue(s)
+    return utils_1.toCommandValue(s)
         .replace(/%/g, '%25')
         .replace(/\r/g, '%0D')
         .replace(/\n/g, '%0A')
@@ -195,6 +182,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const command_1 = __webpack_require__(7351);
+const file_command_1 = __webpack_require__(717);
+const utils_1 = __webpack_require__(5278);
 const os = __importStar(__webpack_require__(2087));
 const path = __importStar(__webpack_require__(5622));
 /**
@@ -221,9 +210,17 @@ var ExitCode;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function exportVariable(name, val) {
-    const convertedVal = command_1.toCommandValue(val);
+    const convertedVal = utils_1.toCommandValue(val);
     process.env[name] = convertedVal;
-    command_1.issueCommand('set-env', { name }, convertedVal);
+    const filePath = process.env['GITHUB_ENV'] || '';
+    if (filePath) {
+        const delimiter = '_GitHubActionsFileCommandDelimeter_';
+        const commandValue = `${name}<<${delimiter}${os.EOL}${convertedVal}${os.EOL}${delimiter}`;
+        file_command_1.issueCommand('ENV', commandValue);
+    }
+    else {
+        command_1.issueCommand('set-env', { name }, convertedVal);
+    }
 }
 exports.exportVariable = exportVariable;
 /**
@@ -239,7 +236,13 @@ exports.setSecret = setSecret;
  * @param inputPath
  */
 function addPath(inputPath) {
-    command_1.issueCommand('add-path', {}, inputPath);
+    const filePath = process.env['GITHUB_PATH'] || '';
+    if (filePath) {
+        file_command_1.issueCommand('PATH', inputPath);
+    }
+    else {
+        command_1.issueCommand('add-path', {}, inputPath);
+    }
     process.env['PATH'] = `${inputPath}${path.delimiter}${process.env['PATH']}`;
 }
 exports.addPath = addPath;
@@ -398,6 +401,68 @@ function getState(name) {
 }
 exports.getState = getState;
 //# sourceMappingURL=core.js.map
+
+/***/ }),
+
+/***/ 717:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+// For internal use, subject to change.
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+// We use any as a valid input type
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const fs = __importStar(__webpack_require__(5747));
+const os = __importStar(__webpack_require__(2087));
+const utils_1 = __webpack_require__(5278);
+function issueCommand(command, message) {
+    const filePath = process.env[`GITHUB_${command}`];
+    if (!filePath) {
+        throw new Error(`Unable to find environment variable for file command ${command}`);
+    }
+    if (!fs.existsSync(filePath)) {
+        throw new Error(`Missing file at path: ${filePath}`);
+    }
+    fs.appendFileSync(filePath, `${utils_1.toCommandValue(message)}${os.EOL}`, {
+        encoding: 'utf8'
+    });
+}
+exports.issueCommand = issueCommand;
+//# sourceMappingURL=file-command.js.map
+
+/***/ }),
+
+/***/ 5278:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+// We use any as a valid input type
+/* eslint-disable @typescript-eslint/no-explicit-any */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+/**
+ * Sanitizes an input into a string so it can be passed into issueCommand safely
+ * @param input input to sanitize into a string
+ */
+function toCommandValue(input) {
+    if (input === null || input === undefined) {
+        return '';
+    }
+    else if (typeof input === 'string' || input instanceof String) {
+        return input;
+    }
+    return JSON.stringify(input);
+}
+exports.toCommandValue = toCommandValue;
+//# sourceMappingURL=utils.js.map
 
 /***/ }),
 
@@ -1652,10 +1717,20 @@ exports.DEFAULT_ERROR = 'Error fetching';
 var serverUrl = 'https://api.giphy.com/v1/';
 var identity = function (i) { return i; };
 var requestMap = {};
+var maxLife = 60000; // clear memory cache every minute
+var purgeCache = function () {
+    var now = Date.now();
+    Object.keys(requestMap).forEach(function (key) {
+        if (now - requestMap[key].ts >= maxLife) {
+            delete requestMap[key];
+        }
+    });
+};
 function request(url, normalizer, pingbackType, noCache) {
     var _this = this;
     if (normalizer === void 0) { normalizer = identity; }
     if (noCache === void 0) { noCache = false; }
+    purgeCache();
     if (!requestMap[url] || noCache) {
         var makeRequest = function () { return __awaiter(_this, void 0, void 0, function () {
             var fetchError, response, result, message, result, _1, unexpectedError_1;
@@ -1706,9 +1781,9 @@ function request(url, normalizer, pingbackType, noCache) {
                 }
             });
         }); };
-        requestMap[url] = makeRequest();
+        requestMap[url] = { request: makeRequest(), ts: Date.now() };
     }
-    return requestMap[url];
+    return requestMap[url].request;
 }
 exports.default = request;
 //# sourceMappingURL=request.js.map
@@ -5831,8 +5906,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 var hasOwnProperty = Object.hasOwnProperty,
     setPrototypeOf = Object.setPrototypeOf,
-    isFrozen = Object.isFrozen,
-    objectKeys = Object.keys;
+    isFrozen = Object.isFrozen;
 var freeze = Object.freeze,
     seal = Object.seal,
     create = Object.create; // eslint-disable-line import/no-mutable-exports
@@ -5866,11 +5940,8 @@ if (!construct) {
 }
 
 var arrayForEach = unapply(Array.prototype.forEach);
-var arrayIndexOf = unapply(Array.prototype.indexOf);
-var arrayJoin = unapply(Array.prototype.join);
 var arrayPop = unapply(Array.prototype.pop);
 var arrayPush = unapply(Array.prototype.push);
-var arraySlice = unapply(Array.prototype.slice);
 
 var stringToLowerCase = unapply(String.prototype.toLowerCase);
 var stringMatch = unapply(String.prototype.match);
@@ -5879,7 +5950,6 @@ var stringIndexOf = unapply(String.prototype.indexOf);
 var stringTrim = unapply(String.prototype.trim);
 
 var regExpTest = unapply(RegExp.prototype.test);
-var regExpCreate = unconstruct(RegExp);
 
 var typeErrorCreate = unconstruct(TypeError);
 
@@ -6035,7 +6105,7 @@ function createDOMPurify() {
    * Version label, exposed for easier checks
    * if DOMPurify is up to date or not
    */
-  DOMPurify.version = '2.0.15';
+  DOMPurify.version = '2.1.1';
 
   /**
    * Array of elements that DOMPurify removed during sanitation.
@@ -6052,7 +6122,6 @@ function createDOMPurify() {
   }
 
   var originalDocument = window.document;
-  var removeTitle = false;
 
   var document = window.document;
   var DocumentFragment = window.DocumentFragment,
@@ -6091,7 +6160,10 @@ function createDOMPurify() {
   var importNode = originalDocument.importNode;
 
 
-  var documentMode = clone(document).documentMode ? document.documentMode : {};
+  var documentMode = {};
+  try {
+    documentMode = clone(document).documentMode ? document.documentMode : {};
+  } catch (_) {}
 
   var hooks = {};
 
@@ -6136,9 +6208,6 @@ function createDOMPurify() {
 
   /* Decide if unknown protocols are okay */
   var ALLOW_UNKNOWN_PROTOCOLS = false;
-
-  /* Output should be safe for jQuery's $() factory? */
-  var SAFE_FOR_JQUERY = false;
 
   /* Output should be safe for common template engines.
    * This means, DOMPurify removes data attributes, mustaches and ERB
@@ -6237,7 +6306,6 @@ function createDOMPurify() {
     ALLOW_ARIA_ATTR = cfg.ALLOW_ARIA_ATTR !== false; // Default true
     ALLOW_DATA_ATTR = cfg.ALLOW_DATA_ATTR !== false; // Default true
     ALLOW_UNKNOWN_PROTOCOLS = cfg.ALLOW_UNKNOWN_PROTOCOLS || false; // Default false
-    SAFE_FOR_JQUERY = cfg.SAFE_FOR_JQUERY || false; // Default false
     SAFE_FOR_TEMPLATES = cfg.SAFE_FOR_TEMPLATES || false; // Default false
     WHOLE_DOCUMENT = cfg.WHOLE_DOCUMENT || false; // Default false
     RETURN_DOM = cfg.RETURN_DOM || false; // Default false
@@ -6392,11 +6460,6 @@ function createDOMPurify() {
       doc = new DOMParser().parseFromString(dirtyPayload, 'text/html');
     } catch (_) {}
 
-    /* Remove title to fix a mXSS bug in older MS Edge */
-    if (removeTitle) {
-      addToSet(FORBID_TAGS, ['title']);
-    }
-
     /* Use createHTMLDocument in case DOMParser is not available */
     if (!doc || !doc.documentElement) {
       doc = implementation.createHTMLDocument('');
@@ -6414,18 +6477,6 @@ function createDOMPurify() {
     /* Work on whole document or just its body */
     return getElementsByTagName.call(doc, WHOLE_DOCUMENT ? 'html' : 'body')[0];
   };
-
-  /* Here we test for a broken feature in Edge that might cause mXSS */
-  if (DOMPurify.isSupported) {
-    (function () {
-      try {
-        var doc = _initDocument('<x/><title>&lt;/title&gt;&lt;img&gt;');
-        if (regExpTest(/<\/title/, doc.querySelector('title').innerHTML)) {
-          removeTitle = true;
-        }
-      } catch (_) {}
-    })();
-  }
 
   /**
    * _createIterator
@@ -6495,7 +6546,6 @@ function createDOMPurify() {
    * @param   {Node} currentNode to check for permission to exist
    * @return  {Boolean} true if node was killed, false if left alive
    */
-  // eslint-disable-next-line complexity
   var _sanitizeElements = function _sanitizeElements(currentNode) {
     var content = void 0;
 
@@ -6529,6 +6579,12 @@ function createDOMPurify() {
       return true;
     }
 
+    /* Detect mXSS attempts abusing namespace confusion */
+    if (!_isNode(currentNode.firstElementChild) && (!_isNode(currentNode.content) || !_isNode(currentNode.content.firstElementChild)) && regExpTest(/<[!/\w]/g, currentNode.innerHTML) && regExpTest(/<[!/\w]/g, currentNode.textContent)) {
+      _forceRemove(currentNode);
+      return true;
+    }
+
     /* Remove element if anything forbids its presence */
     if (!ALLOWED_TAGS[tagName] || FORBID_TAGS[tagName]) {
       /* Keep content except for bad-listed elements */
@@ -6544,24 +6600,9 @@ function createDOMPurify() {
     }
 
     /* Remove in case a noscript/noembed XSS is suspected */
-    if (tagName === 'noscript' && regExpTest(/<\/noscript/i, currentNode.innerHTML)) {
+    if ((tagName === 'noscript' || tagName === 'noembed') && regExpTest(/<\/no(script|embed)/i, currentNode.innerHTML)) {
       _forceRemove(currentNode);
       return true;
-    }
-
-    if (tagName === 'noembed' && regExpTest(/<\/noembed/i, currentNode.innerHTML)) {
-      _forceRemove(currentNode);
-      return true;
-    }
-
-    /* Convert markup to cover jQuery behavior */
-    if (SAFE_FOR_JQUERY && !_isNode(currentNode.firstElementChild) && (!_isNode(currentNode.content) || !_isNode(currentNode.content.firstElementChild)) && regExpTest(/</g, currentNode.textContent)) {
-      arrayPush(DOMPurify.removed, { element: currentNode.cloneNode() });
-      if (currentNode.innerHTML) {
-        currentNode.innerHTML = stringReplace(currentNode.innerHTML, /</g, '&lt;');
-      } else {
-        currentNode.innerHTML = stringReplace(currentNode.textContent, /</g, '&lt;');
-      }
     }
 
     /* Sanitize element content to be template-safe */
@@ -6622,12 +6663,10 @@ function createDOMPurify() {
    *
    * @param  {Node} currentNode to sanitize
    */
-  // eslint-disable-next-line complexity
   var _sanitizeAttributes = function _sanitizeAttributes(currentNode) {
     var attr = void 0;
     var value = void 0;
     var lcName = void 0;
-    var idAttr = void 0;
     var l = void 0;
     /* Execute a hook if present */
     _executeHook('beforeSanitizeAttributes', currentNode, null);
@@ -6671,32 +6710,7 @@ function createDOMPurify() {
       }
 
       /* Remove attribute */
-      // Safari (iOS + Mac), last tested v8.0.5, crashes if you try to
-      // remove a "name" attribute from an <img> tag that has an "id"
-      // attribute at the time.
-      if (lcName === 'name' && currentNode.nodeName === 'IMG' && attributes.id) {
-        idAttr = attributes.id;
-        attributes = arraySlice(attributes, []);
-        _removeAttribute('id', currentNode);
-        _removeAttribute(name, currentNode);
-        if (arrayIndexOf(attributes, idAttr) > l) {
-          currentNode.setAttribute('id', idAttr.value);
-        }
-      } else if (
-      // This works around a bug in Safari, where input[type=file]
-      // cannot be dynamically set after type has been removed
-      currentNode.nodeName === 'INPUT' && lcName === 'type' && value === 'file' && hookEvent.keepAttr && (ALLOWED_ATTR[lcName] || !FORBID_ATTR[lcName])) {
-        continue;
-      } else {
-        // This avoids a crash in Safari v9.0 with double-ids.
-        // The trick is to first set the id to be empty and then to
-        // remove the attribute
-        if (name === 'id') {
-          currentNode.setAttribute(name, '');
-        }
-
-        _removeAttribute(name, currentNode);
-      }
+      _removeAttribute(name, currentNode);
 
       /* Did the hooks approve of the attribute? */
       if (!hookEvent.keepAttr) {
@@ -6704,13 +6718,7 @@ function createDOMPurify() {
       }
 
       /* Work around a security issue in jQuery 3.0 */
-      if (SAFE_FOR_JQUERY && regExpTest(/\/>/i, value)) {
-        _removeAttribute(name, currentNode);
-        continue;
-      }
-
-      /* Take care of an mXSS pattern using namespace switches */
-      if (regExpTest(/svg|math/i, currentNode.namespaceURI) && regExpTest(regExpCreate('</(' + arrayJoin(objectKeys(FORBID_CONTENTS), '|') + ')', 'i'), value)) {
+      if (regExpTest(/\/>/i, value)) {
         _removeAttribute(name, currentNode);
         continue;
       }
@@ -6843,7 +6851,7 @@ function createDOMPurify() {
     if (IN_PLACE) ; else if (dirty instanceof Node) {
       /* If dirty is a DOM element, append to an empty document to avoid
          elements being stripped by the parser */
-      body = _initDocument('<!-->');
+      body = _initDocument('<!---->');
       importedNode = body.ownerDocument.importNode(dirty, true);
       if (importedNode.nodeType === 1 && importedNode.nodeName === 'BODY') {
         /* Node is already a body, use as is */
