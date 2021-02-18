@@ -27,7 +27,7 @@
   "dependencies": {
     "@actions/core": "^1.2.5",
     "@actions/github": "^4.0.0",
-    "@giphy/js-fetch-api": "^1.6.2",
+    "@giphy/js-fetch-api": "^2.2.2",
     "@octokit/core": "^3.1.2",
     "node-fetch": "^2.6.1"
   },
